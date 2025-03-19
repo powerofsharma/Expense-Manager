@@ -38,16 +38,16 @@ def dashboard(username):
     user_budget = next((b for b in budget_data if b["Username"] == username), {"Monthly_Budget": 0})
 
     total_expense = sum(float(e["Amount"]) for e in user_expenses if e["Type"].lower() == "expense")
-    total_income = sum(float(e["Amount"]) for e in user_expenses if e["Type"].lower() == "income")
     monthly_budget = float(user_budget.get("Monthly_Budget", 0))
-    balance = monthly_budget + total_income - total_expense  # Fix: Deduct expenses properly
+    balance = monthly_budget - total_expense  # Fix: Only subtract expenses from budget
+
+    user_expenses.reverse()  # Show recent entries first
 
     return render_template(
         "dashboard.html",
         username=username,
         expenses=user_expenses,
         total_expense=total_expense,
-        total_income=total_income,
         monthly_budget=monthly_budget,
         balance=balance
     )

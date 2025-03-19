@@ -60,7 +60,7 @@
             <button type="submit">Add Transaction</button>
         </form>
 
-        <h3>Transaction History</h3>
+        <h3>Recent Transactions</h3>
         <table>
             <tr>
                 <th>Date</th>
@@ -70,7 +70,7 @@
                 <th>Type</th>
                 <th>Action</th>
             </tr>
-            {% for expense in expenses %}
+            {% for expense in expenses[:5] %}  <!-- Show only recent 5 entries -->
             <tr>
                 <td>{{ expense['Date'] }}</td>
                 <td>₹{{ expense['Amount'] }}</td>
