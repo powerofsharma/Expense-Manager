@@ -9,9 +9,9 @@ app = Flask(__name__)
 # Google Sheets setup
 SCOPE = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 
-# Load Google Sheets credentials
-cred_file = "expense-manager-api-454204-75bcb80b259b.json"  # Updated with your JSON file name
-creds = ServiceAccountCredentials.from_json_keyfile_name(cred_file, SCOPE)
+# Load Google Sheets credentials from environment variable
+cred_json = json.loads(os.getenv("GOOGLE_SHEETS_CREDENTIALS"))  # Load from environment variable
+creds = ServiceAccountCredentials.from_json_keyfile_dict(cred_json, SCOPE)
 client = gspread.authorize(creds)
 
 # Open Google Sheet
