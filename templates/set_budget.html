@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Budget</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>Set Monthly Budget</h2>
+        <form action="{{ url_for('set_budget', username=username) }}" method="POST">
+            <label for="budget">Enter Monthly Budget:</label>
+            <input type="number" name="budget" id="budget" required>
+            <button type="submit">Set Budget</button>
+        </form>
+        <br>
+        <a href="{{ url_for('dashboard', username=username) }}">
+            <button>Back to Dashboard</button>
+        </a>
+    </div>
+</body>
+</html>

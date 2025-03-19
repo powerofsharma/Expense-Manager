@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Transaction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>Add Transaction</h2>
+        <form action="{{ url_for('add_transaction', username=username) }}" method="POST">
+            <label for="date">Date:</label>
+            <input type="date" name="date" id="date" required>
+
+            <label for="amount">Amount:</label>
+            <input type="number" name="amount" id="amount" placeholder="Amount" required>
+
+            <label for="type">Type:</label>
+            <select name="type" id="type" required>
+                <option value="Expense">Expense</option>
+                <option value="Income">Income</option>
+            </select>
+
+            <label for="category">Category:</label>
+            <input type="text" name="category" id="category" placeholder="Category" required>
+
+            <label for="description">Description:</label>
+            <input type="text" name="description" id="description" placeholder="Description" required>
+
+            <button type="submit">Add Transaction</button>
+        </form>
+        <br>
+        <a href="{{ url_for('dashboard', username=username) }}">
+            <button>Back to Dashboard</button>
+        </a>
+    </div>
+</body>
+</html>
