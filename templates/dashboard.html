@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; text-align: center; }
+        .container { width: 90%; max-width: 600px; margin: 20px auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #007bff; color: white; font-weight: bold; }
+        .form-group { display: flex; flex-direction: column; align-items: center; margin-bottom: 10px; }
+        .form-group label { font-weight: bold; margin-bottom: 5px; }
+        .form-group input, .form-group select, .form-group button { width: 90%; padding: 10px; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Welcome, {{ username }}</h2>
+        <p><strong>Monthly Budget:</strong> ₹{{ monthly_budget }}</p>
+        <p><strong>Total Expenses:</strong> ₹{{ total_expense }}</p>
+        <p><strong>Balance:</strong> ₹{{ balance }}</p>
+
+        <h3>Set Monthly Budget</h3>
+        <form action="{{ url_for('set_budget', username=username) }}" method="POST">
+            <div class="form-group">
+                <label for="budget">Enter Monthly Budget</label>
+                <input type="number" name="budget" id="budget" required>
+            </div>
+            <button type="submit">Set Budget</button>
+        </form>
+
+        <h3>Add Transaction</h3>
+        <form action="{{ url_for('add_transaction', username=username) }}" method="POST">
+            <div class="form-group">
+                <label for="date">Date</label>
+                <input type="date" name="date" id="date" required>
+            </div>
+            <div class="form-group">
+                <label for="amount">Amount</label>
+                <input type="number" name="amount" id="amount" placeholder="Amount" required>
+            </div>
+            <div class="form-group">
+                <label for="type">Type</label>
+                <select name="type" id="type" required>
+                    <option value="Expense">Expense</option>
+                    <option value="Income">Income</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="category">Category</label>
+                <input type="text" name="category" id="category" placeholder="Category" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <input type="text" name="description" id="description" placeholder="Description" required>
+            </div>
+            <button type="submit">Add Transaction</button>
+        </form>
+    </div>
+</body>
+</html>
