@@ -37,10 +37,10 @@ def dashboard(username):
     user_expenses = [e for e in expenses_data if e["Username"] == username]
     user_budget = next((b for b in budget_data if b["Username"] == username), {"Monthly_Budget": 0})
 
-    total_expense = sum(float(e["Amount"]) for e in user_expenses if e["Type"] == "Expense")
-    total_income = sum(float(e["Amount"]) for e in user_expenses if e["Type"] == "Income")
+    total_expense = sum(float(e["Amount"]) for e in user_expenses if e["Type"].lower() == "expense")
+    total_income = sum(float(e["Amount"]) for e in user_expenses if e["Type"].lower() == "income")
     monthly_budget = float(user_budget.get("Monthly_Budget", 0))
-    balance = monthly_budget - total_expense
+    balance = monthly_budget + total_income - total_expense  # Fix: Deduct expenses properly
 
     return render_template(
         "dashboard.html",
@@ -62,6 +62,12 @@ def add_transaction(username):
     trans_type = request.form.get("type")
 
     expenses_sheet.append_row([date, amount, category, description, trans_type, username])
+    return redirect(url_for("dashboard", username=username))
+
+
+@app.route("/delete_transaction/<username>/<int:row>", methods=["POST"])
+def delete_transaction(username, row):
+    expenses_sheet.delete_rows(row + 2)  # Fix: Adjusted row index to match Google Sheets row numbering
     return redirect(url_for("dashboard", username=username))
 
 
