@@ -1,27 +1,24 @@
 import os
-import pandas as pd
+import gspread
+import json
+from oauth2client.service_account import ServiceAccountCredentials
 from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
 
-# Set file paths
-EXPENSES_FOLDER = "expenses_files"
-EXPENSES_FILE = os.path.join(EXPENSES_FOLDER, "expenses.xlsx")
-BUDGET_FILE = os.path.join(EXPENSES_FOLDER, "budget.xlsx")
+# Google Sheets setup
+SCOPE = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 
-# Ensure the expenses folder exists
-if not os.path.exists(EXPENSES_FOLDER):
-    os.makedirs(EXPENSES_FOLDER)
+# Load Google Sheets credentials
+cred_file = "expense-manager-api-454204-75bcb80b259b.json"  # Updated with your JSON file name
+creds = ServiceAccountCredentials.from_json_keyfile_name(cred_file, SCOPE)
+client = gspread.authorize(creds)
 
-# Ensure the expense file exists
-if not os.path.exists(EXPENSES_FILE):
-    df_expense = pd.DataFrame(columns=["ID", "Date", "Amount", "Category", "Description", "Type", "Username"])
-    df_expense.to_excel(EXPENSES_FILE, index=False, engine='openpyxl')
-
-# Ensure the budget file exists
-if not os.path.exists(BUDGET_FILE):
-    df_budget = pd.DataFrame(columns=["Username", "Monthly_Budget"])
-    df_budget.to_excel(BUDGET_FILE, index=False, engine='openpyxl')
+# Open Google Sheet
+SHEET_ID = "1abbEg-kBh3DsC5eFcdPN8HezKdZEzwAJZ3GeuioMJMc"  # Updated with your Google Sheet ID
+sheet = client.open_by_key(SHEET_ID)
+expenses_sheet = sheet.worksheet("Expenses")
+budget_sheet = sheet.worksheet("Budget")
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -34,21 +31,21 @@ def index():
 
 @app.route("/dashboard/<username>", methods=["GET", "POST"])
 def dashboard(username):
-    df_expense = pd.read_excel(EXPENSES_FILE, engine='openpyxl')
-    df_budget = pd.read_excel(BUDGET_FILE, engine='openpyxl')
+    expenses_data = expenses_sheet.get_all_records()
+    budget_data = budget_sheet.get_all_records()
 
-    user_expenses = df_expense[df_expense["Username"] == username]
-    user_budget = df_budget[df_budget["Username"] == username]
+    user_expenses = [e for e in expenses_data if e["Username"] == username]
+    user_budget = next((b for b in budget_data if b["Username"] == username), {"Monthly_Budget": 0})
 
-    total_expense = user_expenses[user_expenses["Type"] == "Expense"]["Amount"].sum() if not user_expenses.empty else 0
-    total_income = user_expenses[user_expenses["Type"] == "Income"]["Amount"].sum() if not user_expenses.empty else 0
-    monthly_budget = user_budget["Monthly_Budget"].values[0] if not user_budget.empty else 0
+    total_expense = sum(float(e["Amount"]) for e in user_expenses if e["Type"] == "Expense")
+    total_income = sum(float(e["Amount"]) for e in user_expenses if e["Type"] == "Income")
+    monthly_budget = float(user_budget.get("Monthly_Budget", 0))
     balance = monthly_budget - total_expense
 
     return render_template(
         "dashboard.html",
         username=username,
-        expenses=user_expenses.to_dict(orient="records"),
+        expenses=user_expenses,
         total_expense=total_expense,
         total_income=total_income,
         monthly_budget=monthly_budget,
@@ -59,44 +56,29 @@ def dashboard(username):
 @app.route("/add_transaction/<username>", methods=["POST"])
 def add_transaction(username):
     date = request.form.get("date")
-    amount = float(request.form.get("amount"))
+    amount = request.form.get("amount")
     category = request.form.get("category")
     description = request.form.get("description")
     trans_type = request.form.get("type")
 
-    df = pd.read_excel(EXPENSES_FILE, engine='openpyxl')
-    new_id = df["ID"].max() + 1 if not df.empty else 1
-
-    new_entry = pd.DataFrame([{
-        "ID": new_id,
-        "Date": date,
-        "Amount": amount,
-        "Category": category,
-        "Description": description,
-        "Type": trans_type,
-        "Username": username
-    }])
-
-    df = pd.concat([df, new_entry], ignore_index=True)
-    df.to_excel(EXPENSES_FILE, index=False, engine='openpyxl')
-
+    expenses_sheet.append_row([date, amount, category, description, trans_type, username])
     return redirect(url_for("dashboard", username=username))
 
 
 @app.route("/set_budget/<username>", methods=["POST"])
 def set_budget(username):
-    budget = float(request.form.get("budget"))
-    df_budget = pd.read_excel(BUDGET_FILE, engine='openpyxl')
+    budget = request.form.get("budget")
+    budget_data = budget_sheet.get_all_records()
 
-    if username in df_budget["Username"].values:
-        df_budget.loc[df_budget["Username"] == username, "Monthly_Budget"] = budget
+    user_budget_row = next((i + 2 for i, b in enumerate(budget_data) if b["Username"] == username), None)
+
+    if user_budget_row:
+        budget_sheet.update_cell(user_budget_row, 2, budget)  # Update existing budget
     else:
-        new_budget = pd.DataFrame([{"Username": username, "Monthly_Budget": budget}])
-        df_budget = pd.concat([df_budget, new_budget], ignore_index=True)
+        budget_sheet.append_row([username, budget])  # Add new budget entry
 
-    df_budget.to_excel(BUDGET_FILE, index=False, engine='openpyxl')
     return redirect(url_for("dashboard", username=username))
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0")
+    app.run(debug=True, host="0.0.0.0", port=10000)
