@@ -64,6 +64,17 @@ def add_transaction(username):
     return render_template("add_transaction.html", username=username)
 
 
+@app.route("/transactions/<username>")
+def transactions(username):
+    expenses_data = expenses_sheet.get_all_records()
+    user_expenses = [e for e in expenses_data if e["Username"] == username]
+
+    # ✅ Show only the last 10 transactions
+    user_expenses = user_expenses[-10:]
+
+    return render_template("transactions.html", username=username, expenses=user_expenses)
+
+
 @app.route("/reports/<username>")
 def reports(username):
     expenses_data = expenses_sheet.get_all_records()
