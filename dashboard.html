@@ -3,88 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expense Dashboard</title>
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f4; text-align: center; }
-        .container { width: 90%; max-width: 600px; margin: 20px auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background-color: #007bff; color: white; font-weight: bold; }
-        .form-group { display: flex; flex-direction: column; align-items: center; margin-bottom: 10px; }
-        .form-group label { font-weight: bold; margin-bottom: 5px; }
-        .form-group input, .form-group select, .form-group button { width: 90%; padding: 10px; margin: 5px 0; }
-        .delete-btn { background-color: red; color: white; border: none; padding: 5px 10px; cursor: pointer; }
-    </style>
+    <title>Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <div class="navbar">
+        <h1><i class="fas fa-wallet icon"></i>Expense Manager</h1>
+    </div>
     <div class="container">
         <h2>Welcome, {{ username }}</h2>
-        <p><strong>Monthly Budget:</strong> ₹{{ monthly_budget }}</p>
-        <p><strong>Total Expenses:</strong> ₹{{ total_expense }}</p>
-        <p><strong>Balance:</strong> ₹{{ balance }}</p>
+        <div class="card">
+            <h3>Balance</h3>
+            <p>₹{{ balance }}</p>
+        </div>
 
-        <h3>Set Monthly Budget</h3>
-        <form action="{{ url_for('set_budget', username=username) }}" method="POST">
-            <div class="form-group">
-                <label for="budget">Enter Monthly Budget</label>
-                <input type="number" name="budget" id="budget" required>
-            </div>
-            <button type="submit">Set Budget</button>
-        </form>
-
-        <h3>Add Transaction</h3>
-        <form action="{{ url_for('add_transaction', username=username) }}" method="POST">
-            <div class="form-group">
-                <label for="date">Date</label>
-                <input type="date" name="date" id="date" required>
-            </div>
-            <div class="form-group">
-                <label for="amount">Amount</label>
-                <input type="number" name="amount" id="amount" placeholder="Amount" required>
-            </div>
-            <div class="form-group">
-                <label for="type">Type</label>
-                <select name="type" id="type" required>
-                    <option value="Expense">Expense</option>
-                    <option value="Income">Income</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="category">Category</label>
-                <input type="text" name="category" id="category" placeholder="Category" required>
-            </div>
-            <div class="form-group">
-                <label for="description">Description</label>
-                <input type="text" name="description" id="description" placeholder="Description" required>
-            </div>
-            <button type="submit">Add Transaction</button>
-        </form>
-
-        <h3>Recent Transactions</h3>
-        <table>
-            <tr>
-                <th>Date</th>
-                <th>Amount</th>
-                <th>Category</th>
-                <th>Description</th>
-                <th>Type</th>
-                <th>Action</th>
-            </tr>
-            {% for expense in expenses[:5] %}  <!-- Show only recent 5 entries -->
-            <tr>
-                <td>{{ expense['Date'] }}</td>
-                <td>₹{{ expense['Amount'] }}</td>
-                <td>{{ expense['Category'] }}</td>
-                <td>{{ expense['Description'] }}</td>
-                <td>{{ expense['Type'] }}</td>
-                <td>
-                    <form action="{{ url_for('delete_transaction', username=username, row=loop.index) }}" method="POST">
-                        <button type="submit" class="delete-btn">Delete</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
+        <div class="button-grid">
+            <a href="{{ url_for('add_transaction', username=username) }}" class="btn btn-primary"><i class="fas fa-plus-circle icon"></i>Add Transaction</a>
+            <a href="{{ url_for('transactions', username=username) }}" class="btn btn-secondary"><i class="fas fa-list icon"></i>View Transactions</a>
+            <a href="{{ url_for('set_budget', username=username) }}" class="btn btn-info"><i class="fas fa-chart-pie icon"></i>Set Budget</a>
+            <a href="{{ url_for('reports', username=username) }}" class="btn btn-success"><i class="fas fa-chart-line icon"></i>Reports</a>
+        </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

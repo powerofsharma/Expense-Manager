@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Transactions</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .table-responsive {
+            overflow-x: auto;
+        }
+        .table th, .table td {
+            white-space: nowrap;
+        }
+        .table th:nth-child(5), .table td:nth-child(5) { /* Type column */
+            width: 100px;
+            text-align: center;
+        }
+        .table th:nth-child(6), .table td:nth-child(6) { /* Action column */
+            width: 120px;
+            text-align: center;
+        }
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1><i class="fas fa-list icon"></i> All Transactions</h1>
+    </div>
+    <div class="container">
+        <h2>All Transactions</h2>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th>Type</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for expense in expenses %}
+                    <tr>
+                        <td>{{ expense['Date'] }}</td>
+                        <td>₹{{ expense['Amount'] }}</td>
+                        <td>{{ expense['Category'] }}</td>
+                        <td>{{ expense['Description'] }}</td>
+                        <td class="text-center">{{ expense['Type'] }}</td>
+                        <td class="text-center">
+                            <form action="{{ url_for('delete_transaction', username=username, row=loop.index0) }}" method="POST">
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash icon"></i> Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <br>
+        <a href="{{ url_for('dashboard', username=username) }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left icon"></i> Back to Dashboard
+        </a>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

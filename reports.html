@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Reports</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="navbar">
+        <h1><i class="fas fa-chart-line icon"></i>Expense Reports</h1>
+    </div>
+    <div class="container">
+        <h2>Expense Breakdown</h2>
+        <canvas id="expenseChart" width="400" height="400"></canvas>
+        <br>
+        <a href="{{ url_for('dashboard', username=username) }}" class="btn btn-secondary"><i class="fas fa-arrow-left icon"></i>Back to Dashboard</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+   document.addEventListener("DOMContentLoaded", function() {
+       var categories = {{ categories|tojson }};
+       var amounts = {{ amounts|tojson }};
+
+       console.log("Categories:", categories);
+       console.log("Amounts:", amounts);
+
+       if (categories.length === 0 || amounts.length === 0) {
+           document.getElementById('expenseChart').style.display = 'none';
+           document.querySelector('.container').innerHTML += '<p>No expense data available</p>';
+       } else {
+           var ctx = document.getElementById('expenseChart').getContext('2d');
+           var expenseChart = new Chart(ctx, {
+               type: 'pie',
+               data: {
+                   labels: categories,
+                   datasets: [{
+                       label: 'Expenses',
+                       data: amounts,
+                       backgroundColor: [
+                           'rgba(255, 99, 132, 0.2)',
+                           'rgba(54, 162, 235, 0.2)',
+                           'rgba(255, 206, 86, 0.2)',
+                           'rgba(75, 192, 192, 0.2)',
+                           'rgba(153, 102, 255, 0.2)',
+                           'rgba(255, 159, 64, 0.2)'
+                       ],
+                       borderColor: [
+                           'rgba(255, 99, 132, 1)',
+                           'rgba(54, 162, 235, 1)',
+                           'rgba(255, 206, 86, 1)',
+                           'rgba(75, 192, 192, 1)',
+                           'rgba(153, 102, 255, 1)',
+                           'rgba(255, 159, 64, 1)'
+                       ],
+                       borderWidth: 1
+                   }]
+               },
+               options: {
+                   responsive: true,
+                   plugins: {
+                       legend: { position: 'top' },
+                       title: { display: true, text: 'Expense Breakdown' }
+                   }
+               }
+           });
+       }
+   });
+</script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

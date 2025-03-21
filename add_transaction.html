@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Transaction</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <!-- Fixed Top Bar with Title and Add Button -->
+    <div class="header-container">
+        <div class="header-title">Add Transaction</div>
+        <div class="btn-add-container">
+            <a href="{{ url_for('add_transaction', username=username) }}" class="btn-add">
+                <i class="fas fa-plus-circle"></i> Add Transaction
+            </a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h3 class="text-center mb-4">Add Transaction</h3>
+        <form action="{{ url_for('add_transaction', username=username) }}" method="POST">
+            <div class="mb-3">
+                <label for="date" class="form-label"><strong>Date:</strong></label>
+                <input type="date" name="date" id="date" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="amount" class="form-label"><strong>Amount:</strong></label>
+                <input type="number" name="amount" id="amount" class="form-control" placeholder="Enter amount" step="0.01" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="type" class="form-label"><strong>Type:</strong></label>
+                <select name="type" id="type" class="form-select" required>
+                    <option value="Expense">Expense</option>
+                    <option value="Income">Income</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="category" class="form-label"><strong>Category:</strong></label>
+                <select name="category" id="category" class="form-select" required>
+                    <option value="Food">Food</option>
+                    <option value="Grocery">Grocery</option>
+                    <option value="Rent">Rent</option>
+                    <option value="Medical">Medical</option>
+                    <option value="Shopping">Shopping</option>
+                    <option value="Bills">Bills</option>
+                    <option value="Investment">Investment</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="description" class="form-label"><strong>Description:</strong></label>
+                <input type="text" name="description" id="description" class="form-control" placeholder="Enter description" required>
+            </div>
+
+            <div class="btn-container">
+                <button type="submit" class="btn btn-primary w-50"><i class="fas fa-save"></i> Add</button>
+                <a href="{{ url_for('dashboard', username=username) }}" class="btn btn-secondary w-50"><i class="fas fa-arrow-left"></i> Back</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('date').valueAsDate = new Date();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
