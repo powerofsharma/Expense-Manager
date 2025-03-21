@@ -49,6 +49,21 @@ def dashboard(username):
                            monthly_budget=monthly_budget, balance=balance)
 
 
+@app.route("/add_transaction/<username>", methods=["GET", "POST"])
+def add_transaction(username):
+    if request.method == "POST":
+        date = request.form.get("date")
+        amount = request.form.get("amount")
+        category = request.form.get("category")
+        description = request.form.get("description")
+        trans_type = request.form.get("type")
+
+        expenses_sheet.append_row([date, amount, category, description, trans_type, username])
+        return redirect(url_for("transactions", username=username))
+
+    return render_template("add_transaction.html", username=username)
+
+
 @app.route("/reports/<username>")
 def reports(username):
     expenses_data = expenses_sheet.get_all_records()
